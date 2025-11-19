@@ -1,4 +1,4 @@
-# netzy-proxy-https
+# netzy
 
 Simple HTTP/HTTPS intercepting proxy.
 
