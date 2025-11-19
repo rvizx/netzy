@@ -32,7 +32,7 @@ def restore_terminal():
 def print_banner():
     print(f"\n\033[1;97mnetzy-proxy-https\033[0m \033[2m— http/https intercepting proxy\033[0m")
     print(f"\033[38;5;111ms\033[0m toggle mode  \033[38;5;111mf\033[0m forward  \033[38;5;111md\033[0m drop\n")
-    print(f"\033[2mProxy: 0.0.0.0:{PROXY_PORT}\033[0m")
+    print(f"\033[2mproxy: 0.0.0.0:{PROXY_PORT}\033[0m")
     
     # Get local IP
     try:
@@ -41,10 +41,10 @@ def print_banner():
     except:
         local_ip = '<your-ip>'
     
-    print(f"\033[2mConfigure your device proxy to: \033[1m{local_ip}:{PROXY_PORT}\033[0m\n")
+    print(f"\033[2mproxy: \033[1m{local_ip}:{PROXY_PORT}\033[0m\n")
 
 def parse_http_request(data):
-    """Parse HTTP request and return method, host, path, headers"""
+    # Parse HTTP request and return method, host, path, headers
     try:
         lines = data.decode('utf-8', errors='ignore').split('\r\n')
         if not lines or not lines[0]:
@@ -79,7 +79,7 @@ def parse_http_request(data):
         return None
 
 def print_request(req_info, client_addr, is_https=False):
-    """Pretty print HTTP/HTTPS request details"""
+    # Pretty print HTTP/HTTPS request details
     if not req_info:
         return
     
@@ -96,7 +96,7 @@ def print_request(req_info, client_addr, is_https=False):
     }
     method_color = method_colors.get(method, '\033[38;5;183m')
     
-    protocol = '\033[38;5;203mHTTPS\033[0m' if is_https else '\033[38;5;150mHTTP\033[0m'
+    protocol = '\033[38;5;203mhttps\033[0m' if is_https else '\033[38;5;150mhttp\033[0m'
     
     print(f"\033[38;5;111m{client_addr[0]}:{client_addr[1]}\033[0m  {protocol}  {method_color}{method}\033[0m  \033[38;5;222m{host}\033[0m\033[38;5;183m{path}\033[0m")
     
@@ -113,7 +113,7 @@ def print_request(req_info, client_addr, is_https=False):
         print(f"  \033[38;5;203mqueue: {queue_size}\033[0m")
 
 def forward_http_request(client_sock, req_info, request_data):
-    """Forward HTTP request to target server"""
+    # Forward HTTP request to target server
     try:
         host = req_info['host']
         port = 80
@@ -139,7 +139,7 @@ def forward_http_request(client_sock, req_info, request_data):
         client_sock.close()
 
 def forward_connect_tunnel(client_sock, host, port):
-    """Create HTTPS tunnel for CONNECT requests"""
+    # Create HTTPS tunnel for CONNECT requests
     try:
         target_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         target_sock.settimeout(10)
@@ -174,7 +174,7 @@ def forward_connect_tunnel(client_sock, host, port):
         client_sock.close()
 
 def handle_client(client_sock, client_addr):
-    """Handle incoming client connection"""
+    # Handle incoming client connection
     try:
         data = client_sock.recv(4096, socket.MSG_PEEK)
         if not data:
@@ -240,7 +240,7 @@ def handle_client(client_sock, client_addr):
         client_sock.close()
 
 def keyboard_handler():
-    """Handle keyboard input for forward/drop"""
+    # Handle keyboard input for forward/drop
     global intercept
     while True:
         key = sys.stdin.read(1)
@@ -295,7 +295,7 @@ def keyboard_handler():
                 print(f"\033[2m[queue empty]\033[0m")
 
 def kill_existing_process():
-    """Kill any existing process using our port"""
+    # Kill any existing process using our port
     try:
         result = subprocess.run(
             ['lsof', '-ti', f':{PROXY_PORT}'],
@@ -328,18 +328,18 @@ def main():
         server_sock.bind(('0.0.0.0', PROXY_PORT))
     except OSError as e:
         if e.errno == 98:  # Address already in use
-            print(f"\033[38;5;203m✗\033[0m Port {PROXY_PORT} already in use")
-            print(f"\033[2mTrying to kill existing process...\033[0m")
+            print(f"\033[38;5;203m✗\033[0m port {PROXY_PORT} already in use")
+            print(f"\033[2mtrying to kill existing process...\033[0m")
             kill_existing_process()
             try:
                 server_sock.bind(('0.0.0.0', PROXY_PORT))
-                print(f"\033[38;5;150m✓\033[0m Port {PROXY_PORT} now available\n")
+                print(f"\033[38;5;150m✓\033[0m port {PROXY_PORT} now available\n")
             except:
-                print(f"\033[38;5;203m✗\033[0m Failed to bind to port {PROXY_PORT}")
-                print(f"\033[2mTry: sudo lsof -ti :{PROXY_PORT} | xargs kill -9\033[0m")
+                print(f"\033[38;5;203m✗\033[0m failed to bind to port {PROXY_PORT}")
+                print(f"\033[2mtry: sudo lsof -ti :{PROXY_PORT} | xargs kill -9\033[0m")
                 sys.exit(1)
         else:
-            print(f"\033[38;5;203m✗\033[0m Failed to bind: {e}")
+            print(f"\033[38;5;203m✗\033[0m failed to bind: {e}")
             sys.exit(1)
     
     server_sock.listen(50)

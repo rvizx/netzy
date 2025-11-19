@@ -1,43 +1,71 @@
 #!/bin/bash
 
-echo -e "\n\033[1;97mnetzy-proxy-https setup\033[0m\n"
+echo "netzy-proxy-https setup"
+echo ""
 
-# Check if running as root
-if [ "$EUID" -eq 0 ]; then
-    echo -e "\033[38;5;203m✗\033[0m Don't run setup as root"
+# Detect package manager
+if command -v pacman &> /dev/null; then
+    PKG="pacman"
+elif command -v apt &> /dev/null; then
+    PKG="apt"
+else
+    echo "ERROR: Need pacman or apt"
     exit 1
 fi
 
-# Detect Python
+# Install python3
 if ! command -v python3 &> /dev/null; then
-    echo -e "\033[38;5;203m✗\033[0m python3 not found"
-    exit 1
+    echo "Installing python3..."
+    if [ "$PKG" = "pacman" ]; then
+        sudo pacman -S --noconfirm python
+    else
+        sudo apt update && sudo apt install -y python3
+    fi
 fi
 
-echo -e "\033[38;5;150m✓\033[0m python3 found: $(python3 --version)"
+# Install lsof
+if ! command -v lsof &> /dev/null; then
+    echo "Installing lsof..."
+    if [ "$PKG" = "pacman" ]; then
+        sudo pacman -S --noconfirm lsof
+    else
+        sudo apt install -y lsof
+    fi
+fi
+
+# Install iproute2
+if ! command -v ip &> /dev/null; then
+    echo "Installing iproute2..."
+    if [ "$PKG" = "pacman" ]; then
+        sudo pacman -S --noconfirm iproute2
+    else
+        sudo apt install -y iproute2
+    fi
+fi
 
 # Make executable
 chmod +x netzy-proxy-https.py
 
-echo -e "\033[38;5;150m✓\033[0m made netzy-proxy-https.py executable"
+# Create launch script
+cat > launch.sh << 'EOF'
+#!/bin/bash
+sudo python3 "$(dirname "$0")/netzy-proxy-https.py"
+EOF
+chmod +x launch.sh
 
-# Get local IP
+# Get IP
 LOCAL_IP=$(ip route get 1 2>/dev/null | awk '{print $7; exit}')
-if [ -z "$LOCAL_IP" ]; then
-    LOCAL_IP="<your-ip>"
-fi
+[ -z "$LOCAL_IP" ] && LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+[ -z "$LOCAL_IP" ] && LOCAL_IP="<your-ip>"
 
-echo -e "\n\033[38;5;150m✓\033[0m Setup complete!\n"
-echo -e "\033[1mUsage:\033[0m"
-echo -e "  \033[38;5;222m1.\033[0m Run the proxy:"
-echo -e "     \033[2m$\033[0m sudo python3 netzy-proxy-https.py"
-echo -e ""
-echo -e "  \033[38;5;222m2.\033[0m Configure your mobile device:"
-echo -e "     Proxy: \033[1m${LOCAL_IP}:8080\033[0m"
-echo -e ""
-echo -e "  \033[38;5;222m3.\033[0m Controls:"
-echo -e "     \033[38;5;111ms\033[0m = toggle manual/auto mode"
-echo -e "     \033[38;5;111mf\033[0m = forward queued request"
-echo -e "     \033[38;5;111md\033[0m = drop queued request"
-echo -e ""
-
+echo ""
+echo "Setup complete!"
+echo ""
+echo "Run:    ./launch.sh"
+echo "        or"
+echo "        sudo python3 netzy-proxy-https.py"
+echo ""
+echo "Proxy:  ${LOCAL_IP}:9999"
+echo ""
+echo "Controls: s=toggle  f=forward  d=drop"
+echo ""

@@ -1,6 +1,6 @@
 # netzy-proxy-https
 
-Simple HTTP/HTTPS intercepting proxy for mobile device testing.
+Simple HTTP/HTTPS intercepting proxy.
 
 ## Setup
 
@@ -14,11 +14,13 @@ Simple HTTP/HTTPS intercepting proxy for mobile device testing.
 sudo python3 netzy-proxy-https.py
 ```
 
-## Mobile Configuration
+## Configuration
 
-Configure your mobile device's WiFi proxy settings:
-- **Proxy Host**: Your computer's IP address
-- **Proxy Port**: `8080`
+Configure proxy settings on any device/browser:
+- **Proxy Host**: Your computer's IP address (run `./setup.sh` to see it)
+- **Proxy Port**: `9999`
+
+Works with: phones, browsers (Firefox/Chrome), curl, wget, any HTTP client
 
 ## Controls
 
@@ -28,15 +30,22 @@ Configure your mobile device's WiFi proxy settings:
 
 ## Features
 
-- ✅ HTTP and HTTPS support
-- ✅ CONNECT tunnel for HTTPS
-- ✅ Request interception and inspection
-- ✅ Queue-based forward/drop system
-- ✅ Shows full request details (method, host, path, headers)
-- ✅ Works with mobile devices
+-  HTTP and HTTPS support
+-  CONNECT tunnel for HTTPS
+-  Request interception and inspection
+-  Queue-based forward/drop system
+-  Shows full request details (method, host, path, headers)
+-  Works with any device that supports HTTP proxy
 
 ## Requirements
 
-- Python 3.x (built-in libraries only)
+- Python 3.x (built-in libraries only - **NO pip installs needed**)
 - Root/sudo access (for binding to port)
+
+### What setup.sh installs:
+- `python3` - the Python interpreter itself
+- `lsof` - system tool (for killing port processes)
+- `iproute2` - system tool (for getting your IP)
+
+**Note:** All Python code uses standard library only. No external dependencies.
 
