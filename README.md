@@ -2,19 +2,19 @@
 
 Simple HTTP/HTTPS intercepting proxy.
 
-## Setup
+### Setup
 
 ```bash
 ./setup.sh
 ```
 
-## Usage
+### Usage
 
 ```bash
 sudo python3 netzy-proxy-https.py
 ```
 
-## Configuration
+### Configuration
 
 Configure proxy settings on any device/browser:
 - **Proxy Host**: Your computer's IP address (run `./setup.sh` to see it)
@@ -22,13 +22,13 @@ Configure proxy settings on any device/browser:
 
 Works with: phones, browsers (Firefox/Chrome), curl, wget, any HTTP client
 
-## Controls
+### Controls
 
 - **s** - Toggle between auto-forward and manual mode
 - **f** - Forward the next queued request
 - **d** - Drop the next queued request
 
-## Features
+### Features
 
 -  HTTP and HTTPS support
 -  CONNECT tunnel for HTTPS
@@ -37,15 +37,12 @@ Works with: phones, browsers (Firefox/Chrome), curl, wget, any HTTP client
 -  Shows full request details (method, host, path, headers)
 -  Works with any device that supports HTTP proxy
 
-## Requirements
+### Requirements
 
 - Python 3.x (built-in libraries only - **NO pip installs needed**)
 - Root/sudo access (for binding to port)
 
-### What setup.sh installs:
+#### What setup.sh installs:
 - `python3` - the Python interpreter itself
 - `lsof` - system tool (for killing port processes)
 - `iproute2` - system tool (for getting your IP)
-
-**Note:** All Python code uses standard library only. No external dependencies.
-
